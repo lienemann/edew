@@ -1,0 +1,146 @@
+
+tcEfile := sprintf "%s_t-centrx-E.dat", prefix;
+tsfile := sprintf "%s_starttime.dat", prefix;
+// clear files
+printf "" >>> tcEfile;
+printf "" >>> tsfile;
+
+tt:=0;
+
+write_data:={
+  recalc;
+  printf "%05.0f %10.10e %10.10e\n", tt, centrx.value, 
+   total_energy >> tcEfile;
+}
+
+rr:={
+  r; V;u;V; g50; V;u;V;u;V;u;V;
+  g 10; conj_grad on; g 50; conj_grad off; g 20;
+  redraw; equil;
+}
+
+dostep:={
+  printf "******* Step %5.0f ********\n", tt;
+  conj_grad on;
+  g 10;
+  conj_grad off; g 50;
+  {V;u;V} 4;
+  g 50;
+  conj_grad on;
+  g 10; 
+  conj_grad off; g 50;
+  write_data;
+  tt+=1;
+  redraw;
+}
+
+docstep:={
+  printf "******* Step %5.0f ********\n", tt;
+  conj_grad on;
+  g 10;
+  conj_grad off; g 50;
+  {V;u;V} 4;
+  g 50;
+  conj_grad on;
+  g 10; 
+  conj_grad off; g 50;
+  equilnh;
+  write_data;
+  tt+=1;
+  redraw;  
+}
+
+saveps:={
+  psfile:=sprintf "%s_time%05.0f.ps", prefix, tt;
+  postscript psfile;
+}
+
+// make pads
+x0:=0
+np:=1
+makepads:={
+  spikedist:=psy/minimum(15, ceil(psy/(sl/3)));
+//   pvt1:=new_vertex(x0+sl/2,0,padoffset);
+//   pvt2:=new_vertex(x0+psx-sl/2,0,padoffset);
+  pvt1:=new_vertex(x0,0,padoffset);
+  pvt2:=new_vertex(x0+psx-sl,0,padoffset);
+  yy:=0;
+  while( yy < psy/spikedist ) do
+  {
+//   pvt3:=new_vertex(x0+sl*(0.5-abs(yy mod 1-0.5)),
+// 		   (yy+0.5)*spikedist, padoffset);
+//   pvt4:=new_vertex(psx-sl/2+
+// 		   x0+sl*(0.5-abs(yy mod 1-0.5)),
+// 		   (yy+0.5)*spikedist, padoffset);
+  pvt3:=new_vertex(x0+sl*2*((yy + 0.5) mod 1),
+		   (yy+0.5)*spikedist, padoffset);
+  pvt4:=new_vertex(psx-sl+
+		   x0+sl*2*((yy + 0.5) mod 1),
+		   (yy+0.5)*spikedist, padoffset);
+  ped1:=new_edge(pvt1, pvt3); ped2:=new_edge(pvt3, pvt4);
+  ped3:=new_edge(pvt4, pvt2); ped4:=new_edge(pvt2, pvt1);
+  ped5:=new_edge(pvt4, pvt1);
+  pfc1:=new_facet(ped1, ped2, ped5);
+  foreach facet ff where original == pfc1 do {
+    foreach ff.edges ee do {
+      set ee.vertices fixed;
+      set ee fixed;
+      set ee color clear;
+      set ee no_refine;
+    };
+    set ff fixed; set ff no_refine; set ff density 0;
+    set ff color lightgray; set ff padnr np;
+  };
+  pfc1:=new_facet(ped3, ped4, -ped5);
+  foreach facet ff where original == pfc1 do {
+    foreach ff.edges ee do {
+      set ee.vertices fixed;
+      set ee fixed;
+      set ee color clear;
+      set ee no_refine;
+    };
+    set ff fixed; set ff no_refine; set ff density 0;
+    set ff color lightgray; set ff padnr np;
+  };
+  pvt1:=pvt3;
+  pvt2:=pvt4;
+  yy+=0.5;
+  }
+};
+
+do {
+  x0:= (np-1) * (psx - sl + pg);
+  makepads;
+  np+=1;
+} while(np <= numberofpads);
+
+doinit:={
+  // run init
+  fix centrx;
+  centrx.target := centrx.value;
+  r;r;
+  g 50; redraw;
+  g 50; redraw;
+  g 50; redraw;
+  g 50; redraw;
+  conj_grad;
+  g 50; redraw;
+  hessian;
+  g 10; redraw;
+  { refine edges where on_constraint 1; } 2;
+  g 40; redraw;
+  {V;u;V}5;
+  equiltol:=abs(total_energy)*2e-5;
+  equil;
+  unfix centrx;
+  print "**************";
+  print "* init done. *";
+  print "**************";
+}
+
+showq
+
+quiet off
+// **********************
+// * Ready for input... *
+// **********************

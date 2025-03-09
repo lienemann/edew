@@ -1,0 +1,117 @@
+
+#define gammat      (cos(canglet*pi/180)*surface_tension+(8.85e-12*epsilont*voltaget^2/thicknesst)/2)
+#define gammab      (cos(cangleb*pi/180)*surface_tension+(8.85e-12*epsilonb*voltageb^2/thicknessb)/2)
+#define gammal      (cos(canglel*pi/180)*surface_tension+(8.85e-12*epsilonl*voltagel^2/thicknessl)/2)
+#define gammar      (cos(cangler*pi/180)*surface_tension+(8.85e-12*epsilonr*voltager^2/thicknessr)/2)
+
+constraint 1
+formula: z
+energy:
+e1: 0
+e2: -gammab * x
+e3: 0
+
+constraint 2
+formula: z - height
+energy:
+e1: 0
+e2: gammat * x
+e3: 0
+content:
+c1: 0
+c2: -height * x
+c3: 0
+
+constraint 3
+formula: y
+energy:
+e1: 0
+e2: 0
+e3: gammal * x
+
+constraint 4
+formula: y -  width
+energy:
+e1: 0
+e2: 0
+e3: -gammar * x
+
+vertices
+1 0 0 0 constraint 1,3
+2 0 width 0 constraint 1,4
+3 0 width height constraint 2,4
+4 0 0 height constraint 2,3
+
+101 -(width+height) 0 0 constraint 1,3 fixed
+102 -(width+height) width 0 constraint 1,4 fixed
+103 -(width+height) width height constraint 2,4 fixed
+104 -(width+height) 0 height constraint 2,3 fixed 
+201 (width+height) 0 0 constraint 1,3 fixed
+202 (width+height) width 0 constraint 1,4 fixed
+203 (width+height) width height constraint 2,4 fixed
+204 (width+height) 0 height constraint 2,3 fixed 
+401 (width+height)*1.05 0 0 constraint 1,3 fixed
+402 (width+height)*1.05 width 0 constraint 1,4 fixed
+403 (width+height)*1.05 width height constraint 2,4 fixed
+404 (width+height)*1.05 0 height constraint 2,3 fixed 
+501  -(width+height)*0.95 width*0.45 height constraint 2 fixed
+502  -(width+height)*0.95 width*0.5 height constraint 2 fixed
+503  -(width+height)*0.95 width*0.55 height constraint 2 fixed
+504  -(width+height)*0.85 width*0.5 height constraint 2 fixed
+601  -(width+height)*0.95 width*0.45 0 constraint 1 fixed
+602  -(width+height)*0.925 width*0.55 0 constraint 1 fixed
+603  -(width+height)*0.90 width*0.45 0 constraint 1 fixed
+604  -(width+height)*0.875 width*0.55 0 constraint 1 fixed
+605  -(width+height)*0.85 width*0.45 0 constraint 1 fixed
+701  -(width+height)*0.85 0 height*0.55 constraint 3 fixed
+702  -(width+height)*0.85 0 height*0.45 constraint 3 fixed
+703  -(width+height)*0.9 0 height*0.45 constraint 3 fixed
+801  -(width+height)*0.85 0 height*0.45 constraint 4 fixed
+802  -(width+height)*0.85 0 height*0.55 constraint 4 fixed
+803  -(width+height)*0.9 0 height*0.525 constraint 4 fixed
+804  -(width+height)*0.85 0 height*0.5 constraint 4 fixed
+805  -(width+height)*0.9 0 height*0.45 constraint 4 fixed
+
+
+edges
+ 1  1  2 constraint 1
+ 2  2  3 constraint 4
+ 3  3  4 constraint 2
+ 4  4  1 constraint 3
+101 101 102 fixed no_refine
+102 102 103 fixed no_refine
+103 103 104 fixed no_refine
+104 104 101 fixed no_refine
+201 201 202 fixed no_refine
+202 202 203 fixed no_refine
+203 203 204 fixed no_refine
+204 204 201 fixed no_refine
+301 101 201 fixed no_refine
+302 102 202 fixed no_refine
+303 103 203 fixed no_refine
+304 104 204 fixed no_refine
+401 401 402 fixed no_refine
+402 402 403 fixed no_refine
+403 403 404 fixed no_refine
+404 404 401 fixed no_refine
+501 501 503 fixed no_refine
+502 502 504 fixed no_refine
+601 601 602 fixed no_refine
+602 602 603 fixed no_refine
+603 603 604 fixed no_refine
+604 604 605 fixed no_refine
+605 605 601 fixed no_refine
+701 701 702 fixed no_refine
+702 702 703 fixed no_refine
+801 801 802 fixed no_refine
+802 802 803 fixed no_refine
+803 803 804 fixed no_refine
+804 804 805 fixed no_refine
+
+faces
+1 1 2 3 4 color blue density surface_tension
+
+bodies
+1 1 volume 0
+
+read

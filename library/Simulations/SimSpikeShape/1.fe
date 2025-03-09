@@ -1,0 +1,4 @@
+evolver_version "2.11"
+
+// offset for visualization
+parameter padoffset = 1e-6

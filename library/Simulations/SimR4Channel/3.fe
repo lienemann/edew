@@ -1,0 +1,88 @@
+// *******************************************
+// * Initializing simulation, please wait... *
+// *******************************************
+quiet
+quietgo
+show_trans "5l5d"
+autodisplay off
+gridflag off
+labelflag off
+pscolorflag on
+showon:=1;
+redraw:= {if (showon) then showq;};
+
+equiltol:=0.4e-12
+equil:={
+  do { equiloldE:=total_energy;
+       conj_grad on;
+       g30;
+       conj_grad off; g 20;
+       redraw;
+  } while ( abs( total_energy-equiloldE ) > equiltol );
+  conj_grad off;
+}
+
+tEfile := sprintf "%s_t-E.dat", prefix;
+tsfile := sprintf "%s_starttime.dat", prefix;
+// clear files
+printf "" >>> tEfile;
+printf "" >>> tsfile;
+
+tt:=0;
+
+write_data:={
+  recalc;
+  printf "%05.0f %10.10e\n", tt, 
+   total_energy >> tEfile;
+}
+
+rr:={
+  r; V;u;V; g50; V;u;V;u;V;u;V;
+  g 10; conj_grad on; g 50; conj_grad off; g 20;
+  redraw; equil;
+}
+
+dostep:={
+  printf "******* Step %5.0f ********\n", tt;
+  conj_grad on;
+  g 10;
+  conj_grad off; g 50;
+  {V;u;V} 4;
+  g 50;
+  conj_grad on;
+  g 100; 
+  conj_grad off; g 50;
+  write_data;
+  tt+=1;
+  redraw;
+}
+
+saveps:={
+  psfile:=sprintf "%s_time%05.0f.ps", prefix, tt;
+  postscript psfile;
+}
+
+doinit:={
+  // run init
+  g50;
+  r; g 50; redraw; 
+  r; g 50; redraw;
+  r; g 50; redraw;
+  g 50; redraw;
+  conj_grad;
+  g 50; redraw;
+  {V;u;V}5;
+  g 50; redraw;  
+  equiltol:=abs(total_energy)*2e-5;
+  equil;
+  print "**************";
+  print "* init done. *";
+  print "**************";
+}
+
+showq
+
+quiet off
+// **********************
+// * Ready for input... *
+// **********************

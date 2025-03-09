@@ -1,0 +1,23 @@
+
+#define gamma_LS_SV (cos(cangle_bottom*pi/180)*surface_tension)
+#define gamma_LS_SVtop (cos(cangle_top*pi/180)*surface_tension)
+#define pbl (psx - sl + pg)
+
+define facet attribute padnr integer
+
+constraint 2
+formula: z - topdist
+energy:
+e1: 0
+e2: -gamma_LS_SVtop * x
+e3: 0
+content:
+c1: 0
+c2: -topdist * x
+c3: 0
+
+constraint 1
+formula: z
+energy:
+e1: 0
+e2: -(x*gamma_LS_SV) + ((y<0)?0:((y<psy)?1:0)) * ( \
